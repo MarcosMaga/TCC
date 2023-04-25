@@ -1,95 +1,77 @@
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <DNSServer.h>
-#include <WiFiManager.h>
 
-WiFiClient client;
-ESP8266WebServer server(80); 
+// Defina o nome e a senha do ponto de acesso do ESP8266
+const char* ssid = "SmartWater";
+const char* password = "password";
 
-String Argument_Name, Clients_Response1, Clients_Response2;
+ESP8266WebServer server(80);
+
+void handleRoot() {
+  // Crie a página web com o formulário HTML
+  String html = "<!DOCTYPE html>";
+  html += "<html lang='pt'>";
+  html += "<head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Config. Wifi</title></head>";
+  html += "<body>";
+  html += "<h1 style='text-align: center; width: 40%;'>Configurar WiFi</h1>";
+  html += "<form method='POST' action='/configurar-wifi'>";
+  html += "<label for='ssid'>Nome da rede WiFi:</label>";
+  html += "<select id='ssid' name='ssid' required>";
+
+  int networks = WiFi.scanNetworks();
+
+  for(int i=0; i < networks; i++)
+    html += "<option value='" + WiFi.SSID(i) + "'>" + WiFi.SSID(i) + "</option>";
+  
+  html += "</select><br><br>";
+  html += "<label for='senha'>Senha da rede WiFi:</label>";
+  html += "<input type='password' id='senha' name='senha' required><br><br>";
+  html += "<input type='submit' value='Conectar'>";
+  html += "</form></body></html>";
+
+  // Envie a página web para o cliente
+  server.send(200, "text/html", html);
+}
+
+void handleConfigurarWiFi() {
+  // Obtenha as informações de login da rede WiFi do formulário HTML
+  String ssid = server.arg("ssid");
+  String senha = server.arg("senha");
+
+  // Configure o ESP8266 para se conectar à rede WiFi
+  WiFi.begin(ssid, senha);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+  }
+
+  // Redirecione o usuário para uma página de sucesso
+  server.sendHeader("Location", "http://192.168.4.1/sucesso");
+  server.send(302);
+}
+
+void handleSucesso() {
+  // Envie uma mensagem de sucesso para o usuário
+  String html = "<html><body>";
+  html += "<h1>Configuração concluída!</h1>";
+  html += "<p>O ESP8266 está agora conectado à rede WiFi.</p>";
+  html += "</body></html>";
+  server.send(200, "text/html", html);
+}
 
 void setup() {
-  Serial.begin(115200);
-  WiFiManager wifiManager;
-  wifiManager.setTimeout(180);
-  
-  if(!wifiManager.autoConnect("ESP8266_AP")) {
-    Serial.println("Falha a se conectar");
-    delay(3000);
-    ESP.reset(); //reset and try again
-    delay(5000);
-  }
+  // Inicie o modo de ponto de acesso do ESP8266
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
 
-  Serial.println("WiFi conectado..");
-  server.begin(); 
-  Serial.println("Webserver iniciado");
-  Serial.print("Use this URL to connect: http://");// Print the IP address
-  Serial.print(WiFi.localIP());Serial.println("/");
-  // NOTE: You must use the IP address assigned to YOUR Board when printed/displayed here on your serial port
-  // that's the address you must use, not the one I used !
-  
-  // Next define what the server should do when a client connects
-  server.on("/", HandleClient); // The client connected with no arguments e.g. http:192.160.0.40/
-  server.on("/result", ShowClientResponse);
-}
-
-void HandleClient() {
-  String webpage;
-  webpage =  "<html>";
-   webpage += "<head><title>ESP8266 Input Example</title>";
-    webpage += "<style>";
-     webpage += "body { background-color: #E6E6FA; font-family: Arial, Helvetica, Sans-Serif; Color: blue;}";
-    webpage += "</style>";
-   webpage += "</head>";
-   webpage += "<body>";
-    webpage += "<h1><br>ESP8266 Server - Getting input from a client</h1>";  
-    String IPaddress = WiFi.localIP().toString();
-    webpage += "<form action='http://"+IPaddress+"' method='POST'>";
-     webpage += "&nbsp;&nbsp;&nbsp;&nbsp;Please enter your Name:<input type='text' name='name_input'><BR>";
-     webpage += "Please enter your Address:<input type='text' name='address_input'>&nbsp;<input type='submit' value='Enter'>"; // omit <input type='submit' value='Enter'> for just 'enter'
-    webpage += "</form>";
-   webpage += "</body>";
-  webpage += "</html>";
-  server.send(200, "text/html", webpage); // Send a response to the client asking for input
-  if (server.args() > 0 ) { // Arguments were received
-    for ( uint8_t i = 0; i < server.args(); i++ ) {
-      Serial.print(server.argName(i)); // Display the argument
-      Argument_Name = server.argName(i);
-      if (server.argName(i) == "name_input") {
-        Serial.print(" Input received was: ");
-        Serial.println(server.arg(i));
-        Clients_Response1 = server.arg(i);
-        // e.g. range_maximum = server.arg(i).toInt();   // use string.toInt()   if you wanted to convert the input to an integer number
-        // e.g. range_maximum = server.arg(i).toFloat(); // use string.toFloat() if you wanted to convert the input to a floating point number
-      }
-      if (server.argName(i) == "address_input") {
-        Serial.print(" Input received was: ");
-        Serial.println(server.arg(i));
-        Clients_Response2 = server.arg(i);
-        // e.g. range_maximum = server.arg(i).toInt();   // use string.toInt()   if you wanted to convert the input to an integer number
-        // e.g. range_maximum = server.arg(i).toFloat(); // use string.toFloat() if you wanted to convert the input to a floating point number
-      }
-    }
-  }
-}
-
-void ShowClientResponse() {
-  String webpage;
-  webpage =  "<html>";
-   webpage += "<head><title>ESP8266 Input Example</title>";
-    webpage += "<style>";
-     webpage += "body { background-color: #E6E6FA; font-family: Arial, Helvetica, Sans-Serif; Color: blue;}";
-    webpage += "</style>";
-   webpage += "</head>";
-   webpage += "<body>";
-    webpage += "<h1><br>ESP8266 Server - This was what the client sent</h1>";
-    webpage += "<p>Name received was: " + Clients_Response1 + "</p>";
-    webpage += "<p>Address received was: " + Clients_Response2 + "</p>";
-   webpage += "</body>";
-  webpage += "</html>";
-  server.send(200, "text/html", webpage); // Send a response to the client asking for input
+  // Inicie o servidor web
+  server.on("/", handleRoot);
+  server.on("/configurar-wifi", HTTP_POST, handleConfigurarWiFi);
+  server.on("/sucesso", handleSucesso);
+  server.begin();
 }
 
 void loop() {
-  server.handleClient();
+// solicitações do cliente
+server.handleClient();
 }
