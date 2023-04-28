@@ -6,6 +6,8 @@
 const char* ssid = "SmartWater";
 const char* password = "password";
 
+unsigned long previousMillis = 0;
+
 ESP8266WebServer server(80);
 
 void handleRoot() {
@@ -60,6 +62,7 @@ void handleSucesso() {
 }
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
   // Inicie o modo de ponto de acesso do ESP8266
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
@@ -72,6 +75,15 @@ void setup() {
 }
 
 void loop() {
-// solicitações do cliente
-server.handleClient();
+  server.handleClient();
+  if(WiFi.status() != WL_CONNECTED){
+    unsigned long currentMillis = millis();
+
+    if (currentMillis - previousMillis >= 500) {
+      previousMillis = currentMillis;
+      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    }
+  }else{
+    digitalWrite(LED_BUILTIN, LOW);
+  }
 }
