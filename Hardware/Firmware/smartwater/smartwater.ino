@@ -54,7 +54,10 @@ void handleConfigurarWiFi() {
 
 void handleSucesso() {
   // Envie uma mensagem de sucesso para o usuário
-  String html = "<html><body>";
+  String html = "<!DOCTYPE html>";
+  html += "<html lang='pt'>";
+  html += "<head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Config. Wifi</title></head>";
+  html += "<body>";
   html += "<h1>Configuração concluída!</h1>";
   html += "<p>O ESP8266 está agora conectado à rede WiFi.</p>";
   html += "</body></html>";
