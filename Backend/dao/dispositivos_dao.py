@@ -9,13 +9,12 @@ class DispositivosDao():
             sql = "INSERT INTO dispositivos VALUES ('{}', '{}')".format(macId, datetime.date.today().strftime('%Y-%m-%d'))
             cursor.execute(sql)
             bd.commit()
+            cursor.close()
+            bd.close()
             return 0
         except mysql.connector.Error:
             bd.rollback()
             return None
-        finally:
-            cursor.close()
-            bd.close()
 
     def select_dispositivo_id(macId):
         try:
@@ -23,10 +22,10 @@ class DispositivosDao():
             cursor = bd.cursor()
             sql = "SELECT * FROM dispositivos WHERE macId = '{}'".format(macId)
             cursor.execute(sql)
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            cursor.close()
+            bd.close()
+            return result
         except mysql.connector.Error:
             bd.rollback()
             return None
-        finally:
-            cursor.close()
-            bd.close()

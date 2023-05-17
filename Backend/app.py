@@ -8,7 +8,8 @@ def dispositivo():
     if request.method == 'POST':
         return DispositivosController.cadastrar_dispositivo(request.get_json())
     elif request.method == 'GET':
+        print(request.args.get('mac'))
         return DispositivosController.select_dispositivo(request.args.get('mac'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
