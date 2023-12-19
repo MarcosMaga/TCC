@@ -2,21 +2,22 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-#include <Firebase_ESP_Client.h>
-#include "addons/TokenHelper.h"
-#include "addons/RTDBHelper.h"
-#include "secrets.h"
+//Sensor
+int sensorPin = D2;
+volatile long pulse;
+unsigned long lastTime = 0;
 
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
-bool signupOK = false;
+const float FATOR_CALIBRACAO = 4.5;
 
-// Defina o nome e a senha do ponto de acesso do ESP8266
+float fluxo = 0;
+float volume = 0;
+float volume_total = 0;
+
 const char* ssid = "SmartWater";
 const char* password = "password";
 
 unsigned long previousMillis = 0;
+
 String macId = "";
 
 ESP8266WebServer server(80);
@@ -94,23 +95,10 @@ void handleSucesso() {
   html += "<head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Config. Wifi</title></head>";
   html += "<body>";
   html += "<h1>Configuração concluída!</h1>";
-  html += "<p>O seu dispositivo agora está conectado à sua rede WiFi.</p>";
+  html += "<p>O seu dispositivo agora está conectado à sua rede WiFi. Use o código a baixo para vincular com seu aplicativo: </p>";
+  html += "<h2>" + macId + "</h2>";
   html += "</body></html>";
   server.send(200, "text/html", html);
-
-  config.api_key = API_KEY;
-  config.database_url = DATABASE_URL;
-
-  if (Firebase.signUp(&config, &auth, "", "")) {
-    Serial.println("Login Firebase Ok");
-    signupOK = true;
-  } else
-    Serial.printf("%s\n", config.signer.signupError.message.c_str());
-
-  config.token_status_callback = tokenStatusCallback;
-
-  Firebase.begin(&config, &auth);
-  Firebase.reconnectWiFi(true);
 }
 
 void startId() {
@@ -126,9 +114,13 @@ void setup() {
   startId();
   Serial.println(macId);
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(sensorPin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(sensorPin), increase, RISING);
+
   // Inicie o modo de ponto de acesso do ESP8266
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
+
 
   // Inicie o servidor web
   server.on("/", handleRoot);
@@ -149,21 +141,25 @@ void loop() {
       digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     }
   } else {
-    digitalWrite(LED_BUILTIN, HIGH);
-    unsigned long currentMillis = millis();
-
-    if (currentMillis - previousMillis >= 1000) {
-      if (Firebase.ready() && signupOK) {
-        if (Firebase.RTDB.setString(&fbdo, "devices/" + macId, random(101))) {
-          Serial.println("PASSED");
-          Serial.println("PATH: " + fbdo.dataPath());
-          Serial.println("TYPE: " + fbdo.dataType());
-        } else {
-          Serial.println("FAILED");
-          Serial.println("REASON: " + fbdo.errorReason());
-        }
-      }
-      previousMillis = currentMillis;
+    if (millis() - lastTime > 1000) {
+      detachInterrupt(digitalPinToInterrupt(sensorPin));
+      fluxo = ((1000.0 / (millis() - lastTime)) * pulse) / FATOR_CALIBRACAO;
+      Serial.print("Fluxo de: ");
+      Serial.print(fluxo);
+      Serial.println(" L/min");
+      volume = fluxo / 60;
+      volume_total += volume;
+      Serial.print("Volume: ");
+      Serial.print(volume_total);
+      Serial.println(" L");
+      Serial.println();
+      pulse = 0;
+      lastTime = millis();
+      attachInterrupt(digitalPinToInterrupt(sensorPin), increase, RISING);
     }
   }
+}
+
+ICACHE_RAM_ATTR void increase() {
+  pulse++;
 }
