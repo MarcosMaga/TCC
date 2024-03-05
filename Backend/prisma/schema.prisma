@@ -30,3 +30,12 @@ model Devices{
 
   @@id([userId, deviceId])
 }
+
+model Reading{
+  id Int @id @default(autoincrement())
+  deviceId String
+  value Float
+  createdOn DateTime @default(now())
+
+  @@map("readings")
+}

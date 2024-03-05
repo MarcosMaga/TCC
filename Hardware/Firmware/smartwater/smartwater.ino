@@ -1,22 +1,26 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
+#include "secrets.h"
 
 //Sensor
 int sensorPin = D2;
-volatile long pulse;
-unsigned long lastTime = 0;
+unsigned long lastTime;
+byte sensorInterrupt = 0;
+const float calibrationFactor = 4.5;
+volatile byte pulseCount;
 
-const float FATOR_CALIBRACAO = 4.5;
-
-float fluxo = 0;
-float volume = 0;
-float volume_total = 0;
+float flowRate;
+float flowMillilitres;
+float totalMillilitres;
 
 const char* ssid = "SmartWater";
 const char* password = "password";
 
 unsigned long previousMillis = 0;
+
+int httpCounter = 0;
 
 String macId = "";
 
@@ -58,7 +62,7 @@ void handleConfigurarWiFi() {
   WiFi.begin(ssid, senha);
 
   int time = 0;
-  while (WiFi.status() != WL_CONNECTED && time < 6) {
+  while (WiFi.status() != WL_CONNECTED && time < 20) {
     delay(1000);
     time++;
     Serial.println(time);
@@ -81,8 +85,8 @@ void handleFalha() {
   html += "<html lang='pt'>";
   html += "<head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Config. Wifi</title></head>";
   html += "<body>";
-  html += "<h1>Senha incorreta!</h1>";
-  html += "<p>A senha colocada está incorreta.</p>";
+  html += "<h1>Erro ao se conectar!</h1>";
+  html += "<p>A senha colocada está incorreta ou o dispositivo falhou ao se conectar.</p>";
   html += "<a href='http://192.168.4.1/'>Voltar</a>";
   html += "</body></html>";
   server.send(200, "text/html", html);
@@ -102,10 +106,11 @@ void handleSucesso() {
 }
 
 void startId() {
+  pinMode(sensorPin, INPUT);
   uint8_t mac[6];
   WiFi.macAddress(mac);
   char macStr[18];
-  sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  sprintf(macStr, "%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
   macId = String(macStr);
 }
 
@@ -115,6 +120,14 @@ void setup() {
   Serial.println(macId);
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(sensorPin, INPUT);
+
+  pulseCount = 0;
+  flowRate = 0.0;
+  flowMillilitres = 0;
+  totalMillilitres = 0;
+  lastTime = 0;
+
+  digitalWrite(sensorPin, HIGH);
   attachInterrupt(digitalPinToInterrupt(sensorPin), increase, RISING);
 
   // Inicie o modo de ponto de acesso do ESP8266
@@ -143,23 +156,63 @@ void loop() {
   } else {
     if (millis() - lastTime > 1000) {
       detachInterrupt(digitalPinToInterrupt(sensorPin));
-      fluxo = ((1000.0 / (millis() - lastTime)) * pulse) / FATOR_CALIBRACAO;
-      Serial.print("Fluxo de: ");
-      Serial.print(fluxo);
-      Serial.println(" L/min");
-      volume = fluxo / 60;
-      volume_total += volume;
-      Serial.print("Volume: ");
-      Serial.print(volume_total);
-      Serial.println(" L");
-      Serial.println();
-      pulse = 0;
+      flowRate = ((1000.0 / (millis() - lastTime)) * pulseCount) / calibrationFactor;
       lastTime = millis();
+      flowMillilitres = (flowRate / 60) * 1000;
+      totalMillilitres += flowMillilitres;
+      unsigned int frac;
+      Serial.print("Flow rate: ");
+      Serial.print(int(flowRate)); // Print the integer part of the variable
+      Serial.print("."); // Print the decimal point
+      // Determine the fractional part. The 10 multiplier gives us 1 decimal place.
+      frac = (flowRate - int(flowRate)) * 10;
+      Serial.print(frac, DEC); // Print the fractional part of the variable
+      Serial.print("L/min");
+      // Print the number of litres flowed in this second
+      Serial.print("  Current Liquid Flowing: "); // Output separator
+      Serial.print(flowMillilitres);
+      Serial.print("mL/Sec");
+
+      // Print the cumulative total of litres flowed since starting
+      Serial.print("  Output Liquid Quantity: "); // Output separator
+      Serial.print(totalMillilitres);
+      Serial.println("mL");
+
+      Serial.print("  HTTP Counter: ");
+      Serial.println(httpCounter);
+
+      if(httpCounter == 5){
+        if(totalMillilitres > 0){
+          WiFiClient client;
+          HTTPClient http;
+          
+          http.begin(client, URL);
+          http.addHeader("Content-Type", "application/json");
+          http.addHeader("Secret", SECRET);
+
+          String json = "{\"deviceId\": \"" + macId + "\", \"value\": " + String(totalMillilitres) + "}";
+          Serial.println(json);
+          int httpResponseCode = http.POST(json);
+
+          if(httpResponseCode > 0){
+            Serial.println("HTTP status: " + String(httpResponseCode));
+            if(httpResponseCode == 200){
+              Serial.println("Upload data successful");
+              totalMillilitres = 0;
+            }
+          }
+          http.end();
+        }
+        httpCounter = 0;
+      }
+      
+      pulseCount = 0;
+      httpCounter++;
       attachInterrupt(digitalPinToInterrupt(sensorPin), increase, RISING);
     }
   }
 }
 
 ICACHE_RAM_ATTR void increase() {
-  pulse++;
+  pulseCount++;
 }

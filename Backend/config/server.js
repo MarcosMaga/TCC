@@ -41,7 +41,7 @@ const sessionConfig = expressSession({
 
 app.use(sessionConfig);
 
-server.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, '0.0.0.0', () => {
     console.log("Servidor iniciado na porta " + process.env.PORT);
 })
 

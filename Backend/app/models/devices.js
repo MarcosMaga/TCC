@@ -19,11 +19,11 @@ const deleteDevices = async(deviceId, userId) => {
 }
 
 const getDevicesByUser = async(id) => {
-    return await prisma.post.findMany({
+    return await prisma.devices.findMany({
         where: {
             userId: id
         }
     })
 }
 
-module.exports = {insertDevices, deleteDevices, getDevicesByUser}
+module.exports = {insertDevices, deleteDevices, getDevicesByUser};
