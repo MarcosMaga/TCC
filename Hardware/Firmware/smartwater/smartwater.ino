@@ -14,6 +14,7 @@ volatile byte pulseCount;
 float flowRate;
 float flowMillilitres;
 float totalMillilitres;
+float realTotal;
 
 const char* ssid = "SmartWater";
 const char* password = "password";
@@ -160,6 +161,8 @@ void loop() {
       lastTime = millis();
       flowMillilitres = (flowRate / 60) * 1000;
       totalMillilitres += flowMillilitres;
+      realTotal += flowMillilitres;
+
       unsigned int frac;
       Serial.print("Flow rate: ");
       Serial.print(int(flowRate)); // Print the integer part of the variable
@@ -181,8 +184,12 @@ void loop() {
       Serial.print("  HTTP Counter: ");
       Serial.println(httpCounter);
 
+      Serial.print("Real value: ");
+      Serial.println(realTotal);
+
       if(httpCounter == 5){
         if(totalMillilitres > 0){
+          int millilitresToSend = totalMillilitres;
           WiFiClient client;
           HTTPClient http;
           
@@ -190,7 +197,7 @@ void loop() {
           http.addHeader("Content-Type", "application/json");
           http.addHeader("Secret", SECRET);
 
-          String json = "{\"deviceId\": \"" + macId + "\", \"value\": " + String(totalMillilitres) + "}";
+          String json = "{\"deviceId\": \"" + macId + "\", \"value\": " + String(millilitresToSend) + "}";
           Serial.println(json);
           int httpResponseCode = http.POST(json);
 
@@ -198,7 +205,7 @@ void loop() {
             Serial.println("HTTP status: " + String(httpResponseCode));
             if(httpResponseCode == 200){
               Serial.println("Upload data successful");
-              totalMillilitres = 0;
+              totalMillilitres -= millilitresToSend;
             }
           }
           http.end();
