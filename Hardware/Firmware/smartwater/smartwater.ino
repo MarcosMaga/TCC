@@ -165,19 +165,19 @@ void loop() {
 
       unsigned int frac;
       Serial.print("Flow rate: ");
-      Serial.print(int(flowRate)); // Print the integer part of the variable
-      Serial.print("."); // Print the decimal point
+      Serial.print(int(flowRate));  // Print the integer part of the variable
+      Serial.print(".");            // Print the decimal point
       // Determine the fractional part. The 10 multiplier gives us 1 decimal place.
       frac = (flowRate - int(flowRate)) * 10;
-      Serial.print(frac, DEC); // Print the fractional part of the variable
+      Serial.print(frac, DEC);  // Print the fractional part of the variable
       Serial.print("L/min");
       // Print the number of litres flowed in this second
-      Serial.print("  Current Liquid Flowing: "); // Output separator
+      Serial.print("  Current Liquid Flowing: ");  // Output separator
       Serial.print(flowMillilitres);
       Serial.print("mL/Sec");
 
       // Print the cumulative total of litres flowed since starting
-      Serial.print("  Output Liquid Quantity: "); // Output separator
+      Serial.print("  Output Liquid Quantity: ");  // Output separator
       Serial.print(totalMillilitres);
       Serial.println("mL");
 
@@ -187,32 +187,35 @@ void loop() {
       Serial.print("Real value: ");
       Serial.println(realTotal);
 
-      if(httpCounter == 5){
-        if(totalMillilitres > 0){
-          int millilitresToSend = totalMillilitres;
-          WiFiClient client;
-          HTTPClient http;
-          
-          http.begin(client, URL);
-          http.addHeader("Content-Type", "application/json");
-          http.addHeader("Secret", SECRET);
+      if (httpCounter == 5) {
+        if (totalMillilitres > 0) {
+          float millilitresToSend = totalMillilitres;
 
-          String json = "{\"deviceId\": \"" + macId + "\", \"value\": " + String(millilitresToSend) + "}";
-          Serial.println(json);
-          int httpResponseCode = http.POST(json);
+          if (millilitresToSend > 0) {
+            WiFiClient client;
+            HTTPClient http;
 
-          if(httpResponseCode > 0){
-            Serial.println("HTTP status: " + String(httpResponseCode));
-            if(httpResponseCode == 200){
-              Serial.println("Upload data successful");
-              totalMillilitres -= millilitresToSend;
+            http.begin(client, URL);
+            http.addHeader("Content-Type", "application/json");
+            http.addHeader("Secret", SECRET);
+
+            String json = "{\"deviceId\": \"" + macId + "\", \"value\": " + String(millilitresToSend) + "}";
+            Serial.println(json);
+            int httpResponseCode = http.POST(json);
+
+            if (httpResponseCode > 0) {
+              Serial.println("HTTP status: " + String(httpResponseCode));
+              if (httpResponseCode == 200) {
+                Serial.println("Upload data successful");
+                totalMillilitres -= millilitresToSend;
+              }
             }
+            http.end();
           }
-          http.end();
         }
         httpCounter = 0;
       }
-      
+
       pulseCount = 0;
       httpCounter++;
       attachInterrupt(digitalPinToInterrupt(sensorPin), increase, RISING);
