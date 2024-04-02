@@ -8,7 +8,7 @@
 int sensorPin = D2;
 unsigned long lastTime;
 byte sensorInterrupt = 0;
-const float calibrationFactor = 4.5;
+const float calibrationFactor = 7.05;
 volatile byte pulseCount;
 
 float flowRate;
