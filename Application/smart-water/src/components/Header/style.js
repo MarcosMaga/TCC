@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: "#0099FF",
+        position: 'relative'
     },
     textName: {
         marginRight: 'auto',

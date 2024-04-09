@@ -6,7 +6,7 @@ import axios from 'axios';
 import { AppContext } from "../../contexts/AppContext";
 import { BASE_URL } from '../../config/config';
 import styles from './style';
-import logo from '../../assets/img/logo-smartwater.png'
+import logo from '../../../assets/logo-smartwater.png'
 
 function LoginScreen(){
     const navigation = useNavigation();

@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     container: {
         marginLeft: 5, 
         marginBottom: 'auto', 
-        marginTop: 'auto'
+        marginTop: 'auto',
     },
     menu: {
         backgroundColor: 'white',
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         width: width * 0.85,
         borderRightWidth: 1,
         borderColor: 'gray',
-        zIndex: 9999
+        zIndex: 3
     },
     menuClose: {
         display: 'none'
