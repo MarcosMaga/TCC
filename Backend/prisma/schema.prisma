@@ -27,6 +27,7 @@ model Devices{
   userId String
   user User @relation("UserDevices", fields: [userId], references: [id])
   deviceId String
+  deviceName String
 
   @@id([userId, deviceId])
 }

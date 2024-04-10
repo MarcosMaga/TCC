@@ -10,6 +10,10 @@ function MenuButton(props){
     const navigation = useNavigation();
 
     const goTo = (destination) => {
+        navigation.reset({
+            index: 0,
+            routes: [{ name: destination}]
+        })
         navigation.navigate(destination);
     }
 

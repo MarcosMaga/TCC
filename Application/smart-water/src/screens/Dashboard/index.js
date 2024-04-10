@@ -11,9 +11,9 @@ function Dashboard(){
     const { user, setUser } = React.useContext(AppContext)
     
     return(
-        <View>
+        <View style={styles.container}>
             <Header/>
-            <View style={styles.container}>
+            <View style={styles.containerData}>
                 <HorizontalLine vertical={0} horizontal={6} color='white' size={1} background="#0099FF"/>
                 <Text style={styles.firstText}>Seu consumo</Text>
                 <Text style={styles.waterText}>127,37L</Text>

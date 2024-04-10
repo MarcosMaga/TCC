@@ -16,6 +16,10 @@ function Menu(){
     const logout = async () => {
         try{
             await axios.get(`${BASE_URL}/logout`);
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login'}]
+            })
             navigation.navigate('Login');
         }catch(error){
             console.log(error);
@@ -30,7 +34,8 @@ function Menu(){
                         <Text style={styles.menuItensText}><AntDesign name="menufold" size={18} color='#0099FF'/> Fechar Menu</Text>
                     </TouchableOpacity>
                 </View>
-                <MenuButton type="SimpleLineIcons" name="speedometer" destination="" text="Dispositivos"/>
+                <MenuButton type="Entypo" name="circular-graph" destination="Dashboard" text="Dashboard"/>
+                <MenuButton type="SimpleLineIcons" name="speedometer" destination="Devices" text="Dispositivos"/>
                 <View style={styles.menuContainer}>
                     <TouchableOpacity onPress={logout}>       
                         <Text style={styles.menuItensText}><AntDesign name="logout" size={18} color='#0099FF'/> Logout</Text>

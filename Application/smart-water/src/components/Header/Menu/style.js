@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
         marginLeft: 5, 
         marginBottom: 'auto', 
         marginTop: 'auto',
+        overflow: 'visible'
     },
     menu: {
         backgroundColor: 'white',
@@ -20,7 +21,8 @@ const styles = StyleSheet.create({
         width: width * 0.85,
         borderRightWidth: 1,
         borderColor: 'gray',
-        zIndex: 3
+        zIndex: 9999,
+        overflow: 'visible'
     },
     menuClose: {
         display: 'none'

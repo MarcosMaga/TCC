@@ -31,6 +31,10 @@ function LoginScreen(){
                 email: response.data.email,
                 createdOn: response.data.createdOn
             })
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Dashboard'}]
+            })
             navigation.navigate('Dashboard');
         } catch (error){
             error.response?.data?.error ? setError(error.response.data.error) : setError(`Erro com o servidor`);
