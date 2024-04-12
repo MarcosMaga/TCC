@@ -3,7 +3,9 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const create = (req, res) => {
-    devicesModel.insertDevices(req.body)
+    let data = req.body;
+    data.userId = req.session.user.id;
+    devicesModel.insertDevices(data)
         .then((devices) => {
             res.status(200).send(devices);
         }).catch((error) => {

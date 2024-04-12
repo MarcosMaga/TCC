@@ -6,10 +6,8 @@ const styles = StyleSheet.create({
     buttonContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: windowHeight - 120
     },
     button:{
-        position: 'absolute',
         backgroundColor: "#0099FF",
         justifyContent: 'center',
         alignItems: 'center',
@@ -17,6 +15,7 @@ const styles = StyleSheet.create({
         padding: 10,
         bottom: 0,
         zIndex: -2,
+        marginVertical: 5,
         width: '95%'
     },
     textButton: {
