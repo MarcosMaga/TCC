@@ -9,11 +9,17 @@ const styles = StyleSheet.create({
         zIndex: -3
     },
     firstText: {
-        marginVertical: 10,
+        marginTop: 10,
+        marginBottom: 0,
         color: 'white',
         textAlign: 'center',
         fontSize: 28,
         fontWeight: '300'
+    },
+    nameText: {
+        textAlign: 'center',
+        color: 'white',
+        marginVertical: 1
     },
     waterText: {
         fontSize: 40,

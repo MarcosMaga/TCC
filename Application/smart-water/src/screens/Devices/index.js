@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import Header from "../../components/Header";
 import DeviceItem from "../../components/DeviceItem";
-import { BASE_URL } from "../../config/config"
+import { BASE_URL } from "../../config/config";
 import styles from "./style";
 
 function Devices(){
