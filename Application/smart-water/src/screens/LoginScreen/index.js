@@ -2,6 +2,9 @@ import React from "react";
 import {View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import "core-js/stable/atob";
+import { jwtDecode } from "jwt-decode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { AppContext } from "../../contexts/AppContext";
 import { BASE_URL } from '../../config/config';
@@ -25,11 +28,14 @@ function LoginScreen(){
                 email,
                 password
             })
+
+            await AsyncStorage.setItem('token', response.data.token);
+            const decodedToken = jwtDecode(response.data.token);
             setUser({
-                id: response.data.id,
-                name: response.data.name,
-                email: response.data.email,
-                createdOn: response.data.createdOn
+                id: decodedToken.id,
+                name: decodedToken.name,
+                email: decodedToken.email,
+                createdOn: decodedToken.createdOn
             })
             navigation.reset({
                 index: 0,

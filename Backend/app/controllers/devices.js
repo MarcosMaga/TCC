@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 const create = (req, res) => {
     let data = req.body;
-    data.userId = req.session.user.id;
+    data.userId = req.user.id;
     devicesModel.insertDevices(data)
         .then((devices) => {
             res.status(200).send(devices);
@@ -19,7 +19,7 @@ const create = (req, res) => {
 }
 
 const get = (req, res) => {
-    devicesModel.getDevicesByUser(req.session.user.id)
+    devicesModel.getDevicesByUser(req.user.id)
         .then((devices) => {
             res.status(devices.length ? 200 : 204).send(devices)
         }).catch((error) => {

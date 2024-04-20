@@ -15,4 +15,19 @@ const getReadingsByDevice = async(id) => {
     })
 }
 
-module.exports = {insertReading, getReadingsByDevice};
+const getReadingsByMonth = async(id) => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    return await prisma.readings.aggregate({
+        _sum: {
+            value: true,
+        },
+        where: {
+            createdOn: {
+                contains: `${currentMonth}`
+            }
+        }
+    })
+}
+module.exports = {insertReading, getReadingsByDevice, getReadingsByMonth};

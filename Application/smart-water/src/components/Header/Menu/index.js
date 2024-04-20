@@ -15,7 +15,7 @@ function Menu(){
 
     const logout = async () => {
         try{
-            await axios.get(`${BASE_URL}/logout`);
+            await AsyncStorage.removeItem('token');
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'Login'}]

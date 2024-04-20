@@ -29,4 +29,17 @@ const get = (req, res) => {
         })
 }
 
-module.exports = {create, get};
+const getRealTimeConsumption = (socket) => {
+    const getData = () => {
+        socket.emit('consumption', socket.handshake.query.id);
+    }
+
+    if(socket.user){
+        getData();
+        setInterval(() => {
+            getData();
+        }, 2000);
+    }
+}
+
+module.exports = {create, get, getRealTimeConsumption};

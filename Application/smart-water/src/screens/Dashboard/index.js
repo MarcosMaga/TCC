@@ -9,6 +9,7 @@ import Header from "../../components/Header";
 import HorizontalLine from "../../components/HorizontalLine";
 import styles from "./style";
 import CustomIcon from "../../components/CustomIcon";
+import Consumption from "../../components/Consumption";
 import { BASE_URL } from "../../config/config";
 
 function Dashboard() {
@@ -21,7 +22,12 @@ function Dashboard() {
 
     const handleGetDevices = async () => {
         try{
-            const response = await axios.get(`${BASE_URL}/devices`);
+            const token = await AsyncStorage.getItem('token');
+            const response = await axios.get(`${BASE_URL}/devices`, {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
             if(response.data)
                 setDevices(response.data);
             else
@@ -79,6 +85,7 @@ function Dashboard() {
                 <Text style={styles.firstText}>{activeDevice !== '' ? 'Seu consumo' : 'Selecione um dispositivo'}</Text>
                 <Text style={styles.nameText}>{activeDevice ? activeDevice.deviceName : null}</Text>
                 <Text style={styles.waterText}>127,37L</Text>
+                {activeDevice ? <Consumption deviceId={activeDevice.deviceId}/>: ''}
                 <TouchableOpacity style={styles.deviceButton} onPress={() => {pickerRef.current.focus()}}>
                     <Text style={styles.deviceButtonText}><CustomIcon type="SimpleLineIcons" name="speedometer" size={18} /> TROCAR DISPOSITIVO</Text>
                     <Picker

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Header from '../../../components/Header';
 import styles from "./style";
@@ -36,9 +37,14 @@ function AddDevice(){
     const handleAddDevice = async () => {
         try{
             setLoading(true);
+            const token = await AsyncStorage.getItem('token')
             await axios.post(`${BASE_URL}/devices`, {
                 deviceId,
                 deviceName
+            }, {
+                headers: {
+                    Authorization: `${token}`
+                }
             })
             navigation.reset({
                 index: 0,

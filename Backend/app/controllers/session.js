@@ -1,6 +1,9 @@
 const usersModel = require('../models/user');
 const logger = require('../../config/logger');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
+dotenv.config();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -17,10 +20,10 @@ const signin = (req, res) => {
                         user.ip = req.ip;
                         usersModel.updateUser(user.id, user);
                         delete user.password;
-                        req.session.user = user;
-                        res.status(200).send(user);
+                        const token = jwt.sign(user, process.env.SECRET, {expiresIn: '1h'});
+                        res.json({token});
                     } else {
-                        res.status(404).send({ error: "Senha ou email incorreto" });
+                        res.status(401).send({ error: "Senha ou email incorreto" });
                     }
                 })
             } else
@@ -65,12 +68,4 @@ const signup = (req, res, error) => {
     }
 }
 
-const logout = (req, res) => {
-    req.session.destroy(err => {
-        if (err)
-            logger.error(`Erro ao deslogar usuário @${req.session.user.username}`);
-        res.status(200).end();
-    })
-}
-
-module.exports = { signin, signup, logout };
+module.exports = { signin, signup };

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Header from "../../components/Header";
 import DeviceItem from "../../components/DeviceItem";
@@ -14,7 +15,12 @@ function Devices(){
     
     const handleGetDevices = async () => {
         try{
-            const response = await axios.get(`${BASE_URL}/devices`);
+            const token = await AsyncStorage.getItem('token');
+            const response = await axios.get(`${BASE_URL}/devices`, {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
             setDevices(response.data);
         }catch(error){
             console.log(error);
