@@ -4,10 +4,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import styles from "./style";
 import MenuButton from "./MenuButton";
-import { BASE_URL } from '../../../config/config';
 
 function Menu(){
     const [menuOpen, setMenuOpen] = React.useState(false);
