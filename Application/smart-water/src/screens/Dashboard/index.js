@@ -15,8 +15,42 @@ import { BASE_URL } from "../../config/config";
 function Dashboard() {
     const { user, setUser } = React.useContext(AppContext);
     const [activeDevice, setActiveDevice] = React.useState({});
+    const [socket, setSocket] = React.useState(null);
     const [devices, setDevices] = React.useState([]);
+    const [consumption, setConsumption] = React.useState(0);
     const pickerRef = React.useRef();
+
+    const connectToSocket = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+
+            if(activeDevice.deviceId){
+                const newSocket = io(`${BASE_URL}`, {
+                    auth: {
+                        token: token
+                    }, 
+                    query: {
+                        'id': activeDevice.deviceId
+                    }
+                });
+
+                setSocket(newSocket);
+    
+                newSocket.on('consumption', (data) => {
+                    setConsumption(data);
+                })
+
+
+                return () => {
+                    newSocket.disconnect();
+                };
+            }else
+                console.log('id não definido');
+
+        } catch (error) {
+            console.error('Erro ao conectar ao socket:', error);
+        }
+    };
 
     const verifyDevice = async (id, list) => {
         const result = await new Promise((resolve, reject) => {
@@ -63,8 +97,6 @@ function Dashboard() {
             if(!deviceFind || data.length == 0){
                 setActiveDevice({});
                 saveData({});
-            }else{
-                setSelectedDevice(storedData.deviceId);
             }
         }catch(error){
             console.log(error);
@@ -86,15 +118,19 @@ function Dashboard() {
 
     const handleValueChange = (itemValue, itemIndex) => {
         if(itemIndex >= 0 && itemValue != "default-value"){
-            setSelectedDevice(itemValue);
             saveData(itemValue);
-        }
-            
+        } 
     }
 
     React.useEffect(() => {
         handleGetDevices();
     }, []);
+
+    React.useEffect(() => {
+        if(socket)
+            socket.disconnect();
+        connectToSocket();
+    }, [activeDevice])
 
     return (
         <View style={styles.container}>
@@ -102,14 +138,14 @@ function Dashboard() {
             <View style={styles.containerData}>
                 <HorizontalLine vertical={0} horizontal={6} color='white' size={1} background="#0099FF" />
                 <Text style={styles.firstText}>{activeDevice !== '' ? 'Seu consumo' : 'Selecione um dispositivo'}</Text>
-                <Text style={styles.nameText}>{activeDevice.deviceName}</Text>
-                <Text style={styles.waterText}>127,37L</Text>
+                <Text style={styles.nameText}>{activeDevice ? activeDevice.deviceName : '-'}</Text>
+                <Text style={styles.waterText}>{consumption.toFixed(2).replace('.', ',')}L</Text>
                 <TouchableOpacity style={styles.deviceButton} onPress={() => {pickerRef.current.focus()}}>
                     <Text style={styles.deviceButtonText}><CustomIcon type="SimpleLineIcons" name="speedometer" size={18} /> TROCAR DISPOSITIVO</Text>
                     <Picker
                         ref={pickerRef}
                         dropdownIconColor={"#0099FF"}
-                        selectedValue={activeDevice.deviceId}
+                        selectedValue={activeDevice ? activeDevice.deviceId : null}
                         style={{ display: 'none' }}
                         onValueChange={handleValueChange}
                         >

@@ -16,17 +16,24 @@ const getReadingsByDevice = async(id) => {
 }
 
 const getReadingsByMonth = async(id) => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-
-    return await prisma.readings.aggregate({
+    return await prisma.reading.aggregate({
         _sum: {
             value: true,
         },
+        _count: {
+            id: true,
+        },
         where: {
-            createdOn: {
-                contains: `${currentMonth}`
-            }
+            AND: [
+                {
+                    createdOn: {
+                        gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                    }
+                },
+                {
+                    deviceId: id
+                }
+            ]
         }
     })
 }
