@@ -31,11 +31,13 @@ function LoginScreen(){
 
             await AsyncStorage.setItem('token', response.data.token);
             const decodedToken = jwtDecode(response.data.token);
+            console.log(decodedToken);
             setUser({
                 id: decodedToken.id,
                 name: decodedToken.name,
                 email: decodedToken.email,
-                createdOn: decodedToken.createdOn
+                createdOn: decodedToken.createdOn,
+                setting: decodedToken.setting
             })
             navigation.reset({
                 index: 0,

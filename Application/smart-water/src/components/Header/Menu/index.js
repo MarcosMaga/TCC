@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import styles from "./style";

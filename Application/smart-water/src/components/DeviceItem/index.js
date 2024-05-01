@@ -16,7 +16,7 @@ function DeviceItem(props){
         try{
             await axios.delete(`${BASE_URL}/devices/${device}`, {
                 headers: {
-                    Authorization: `${token}`
+                    Authorization: token
                 }
             });
         }catch(error){

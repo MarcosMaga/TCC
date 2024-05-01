@@ -11,6 +11,7 @@ import HorizontalLine from "../../components/HorizontalLine";
 import styles from "./style";
 import CustomIcon from "../../components/CustomIcon";
 import { BASE_URL } from "../../config/config";
+import ChartMonth from "../../components/ChartMonth";
 
 function Dashboard() {
     const { user, setUser } = React.useContext(AppContext);
@@ -136,8 +137,8 @@ function Dashboard() {
         <View style={styles.container}>
             <Header />
             <View style={styles.containerData}>
-                <HorizontalLine vertical={0} horizontal={6} color='white' size={1} background="#0099FF" />
-                <Text style={styles.firstText}>{activeDevice !== '' ? 'Seu consumo' : 'Selecione um dispositivo'}</Text>
+                <HorizontalLine horizontal={6} color='white' size={1} background="#0099FF" />
+                <Text style={styles.firstText}>{activeDevice ? 'Seu consumo' : 'Selecione um dispositivo'}</Text>
                 <Text style={styles.nameText}>{activeDevice ? activeDevice.deviceName : '-'}</Text>
                 <Text style={styles.waterText}>{consumption.toFixed(2).replace('.', ',')}L</Text>
                 <TouchableOpacity style={styles.deviceButton} onPress={() => {pickerRef.current.focus()}}>
@@ -155,6 +156,9 @@ function Dashboard() {
                         ))}
                     </Picker>
                 </TouchableOpacity>
+            </View>
+            <View style={styles.infoArea}>
+                <ChartMonth deviceId={activeDevice ? activeDevice.deviceId : null} value={consumption}/>
             </View>
         </View>
     )

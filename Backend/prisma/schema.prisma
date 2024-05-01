@@ -19,6 +19,7 @@ model User {
   createdOn DateTime @default(now())
 
   devices Devices[] @relation("UserDevices")
+  setting Setting?
 
   @@map("users")
 }
@@ -39,4 +40,12 @@ model Reading{
   createdOn DateTime @default(now())
 
   @@map("readings")
+}
+
+model Setting{
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+  goal Int?
+
+  @@map("settings")
 }

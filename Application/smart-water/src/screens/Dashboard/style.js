@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#0099FF",
     },
     containerData:{
-        zIndex: -3
+        zIndex: -3,
     },
     firstText: {
         marginTop: 10,
@@ -41,6 +41,14 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontSize: 18
+    },
+    infoArea: {
+        backgroundColor: '#F2F2F2',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: -3
     }
 })
 

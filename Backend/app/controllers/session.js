@@ -18,9 +18,10 @@ const signin = (req, res) => {
                     }
                     if (result) {
                         user.ip = req.ip;
-                        usersModel.updateUser(user.id, user);
                         delete user.password;
                         const token = jwt.sign(user, process.env.SECRET, {expiresIn: '1h'});
+                        delete user.setting;
+                        usersModel.updateUser(user.id, user);
                         res.json({token});
                     } else {
                         res.status(401).send({ error: "Senha ou email incorreto" });

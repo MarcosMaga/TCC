@@ -12,5 +12,8 @@ module.exports = {
         app.get('/reading/device/:id', userLogged, (req, res) => {
             readingController.get(req, res);
         })
+        app.get('/reading/month/:id', userLogged, (req, res) => {
+            readingController.byMonth(req, res);
+        })
     }
 }

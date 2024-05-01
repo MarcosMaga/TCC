@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const dotenv = require('dotenv');
+const { reading } = require('../routes/reading');
 dotenv.config();
 
 const create = (req, res, validation) => {
@@ -44,7 +45,7 @@ const getRealTimeConsumption = (socket) => {
                         devicesModel.getDevicesByUser(decoded.id)
                             .then((devices) => {
                                 if (devices.find(device => device.deviceId === socket.handshake.query.id)) {
-                                    readingModel.getReadingsByMonth(socket.handshake.query.id)
+                                    readingModel.getReadingsByActuallyMonth(socket.handshake.query.id)
                                         .then((value) => {
                                             if (quant != value._count.id) {
                                                 quant = value._count.id;
@@ -75,4 +76,40 @@ const getRealTimeConsumption = (socket) => {
     }
 }
 
-module.exports = { create, get, getRealTimeConsumption };
+const byMonth = (req, res) => {
+    if(req.params.id){
+        devicesModel.getDevicesByUser(req.user.id)
+        .then((devices) => {
+            if(devices.find(device => device.deviceId === req.params.id)) {
+                readingModel.getReadingsByDevice(req.params.id)
+                    .then((readings) => {
+                        let readingsByMonth = {};
+
+                        readings.forEach(reading => {
+                            const date = new Date(reading.createdOn);
+
+                            if(`${date.getMonth()+1}/${date.getFullYear().toString().slice(-2)}` in readingsByMonth)
+                                readingsByMonth[`${date.getMonth()+1}/${date.getFullYear().toString().slice(-2)}`] += reading.value / 1000;
+                            else
+                                readingsByMonth[`${date.getMonth()+1}/${date.getFullYear().toString().slice(-2)}`] = reading.value / 1000;
+                        })
+                        res.status(200).send(readingsByMonth);
+                    }).catch((error) => {
+                        console.error(error);
+                    }).finally(async () => {
+                        await prisma.$disconnect();
+                    })
+            }else{
+                res.status(403).send({msg: 'Acesso negado'});
+            }
+        }).catch((error) => {
+            console.error(error);
+        }).finally(async () => {
+            await prisma.$disconnect();
+        })
+    }else{
+        res.status(400).send({error: 'ID do dispositivo não fornecido'});
+    }
+}
+
+module.exports = { create, get, getRealTimeConsumption, byMonth };

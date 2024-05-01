@@ -9,8 +9,9 @@ function HorizontalLine(props) {
     line: {
       borderBottomColor: props.color,
       borderBottomWidth: props.size,
-      marginVertical: props.vertical,
-      marginHorizontal: props.horizontal
+      marginTop: props.top || 0,
+      marginBottom: props.bottom || 0,
+      marginHorizontal: props.horizontal || 0
     },
   });
 

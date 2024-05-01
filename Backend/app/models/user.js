@@ -19,6 +19,9 @@ const getUserByEmail = async(email) => {
         where:{
             email: email,
         },
+        include: {
+            setting: true
+        }
     });
 }
 
