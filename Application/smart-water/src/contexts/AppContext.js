@@ -7,7 +7,8 @@ function AppProvider({children}){
         id: null,
         name: null,
         email: null,
-        createdOn: null
+        createdOn: null,
+        setting: null
     });
 
     return(

@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Platform } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
@@ -6,10 +6,21 @@ const styles = StyleSheet.create({
         zIndex: -3,
         borderRadius: 10,
         marginTop: 15,
-        width: Dimensions.get('window').width - 25
+        width: Dimensions.get('window').width - 25,
+        ...Platform.select({
+            ios: {
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.25,
+              shadowRadius: 25,
+            },
+            android: {
+              elevation: 5,
+            },
+        }),
     },
     chartTitle: {
-        color: '#464C4E',
+        color: '#1F1F1F',
         fontSize: 25,
         fontWeight: '400',
         marginHorizontal: 10,
@@ -27,6 +38,12 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         margin: 5
+    },
+    goalText: {
+        fontSize: 20,
+        marginHorizontal: 20,
+        marginTop: 20,
+        marginBottom: 5
     }
 })
 

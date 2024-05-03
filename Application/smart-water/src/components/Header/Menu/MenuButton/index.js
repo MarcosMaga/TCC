@@ -32,7 +32,7 @@ function MenuButton(props){
     return(
         <View style={styles.menuContainer}>
             <TouchableOpacity onPress={() => {goTo(props.destination)}}>       
-                <Text style={styles.menuItensText}><Icon name={props.name} size={18} color='#0099FF'/> {props.text}</Text>
+                <Text style={styles.menuItensText}><Icon name={props.name} size={23} color='#0099FF'/> {props.text}</Text>
             </TouchableOpacity>
         </View>
     )

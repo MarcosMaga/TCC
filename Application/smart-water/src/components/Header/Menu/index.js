@@ -27,17 +27,18 @@ function Menu(){
 
     return(
         <View>
-            <View style={menuOpen ? styles.menu : styles.menuClose}>
+            <View style={menuOpen == true ? styles.menu : styles.menuClose}>
                 <View style={styles.menuContainer}>
                     <TouchableOpacity onPress={() => {setMenuOpen(false)}}>       
-                        <Text style={styles.menuItensText}><AntDesign name="menufold" size={18} color='#0099FF'/> Fechar Menu</Text>
+                        <Text style={styles.menuItensText}><AntDesign name="menufold" size={23} color='#0099FF'/> Fechar Menu</Text>
                     </TouchableOpacity>
                 </View>
                 <MenuButton type="Entypo" name="circular-graph" destination="Dashboard" text="Dashboard"/>
                 <MenuButton type="SimpleLineIcons" name="speedometer" destination="Devices" text="Dispositivos"/>
+                <MenuButton type="SimpleLineIcons" name="target" destination="Goal" text="Metas"/>
                 <View style={styles.menuContainer}>
                     <TouchableOpacity onPress={logout}>       
-                        <Text style={styles.menuItensText}><AntDesign name="logout" size={18} color='#0099FF'/> Logout</Text>
+                        <Text style={styles.menuItensText}><AntDesign name="logout" size={23} color='#0099FF'/> Logout</Text>
                     </TouchableOpacity>
                 </View>
             </View>

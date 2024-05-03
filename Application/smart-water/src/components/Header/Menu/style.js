@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         borderRightWidth: 1,
         borderColor: 'gray',
         zIndex: 9999,
-        overflow: 'visible'
+        overflow: 'visible',
     },
     menuClose: {
         display: 'none'
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     menuItensText: {
-        fontSize: 18,
+        fontSize: 23,
         padding: 10
     }
 })

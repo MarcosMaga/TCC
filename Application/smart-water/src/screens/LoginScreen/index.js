@@ -13,7 +13,7 @@ import logo from '../../../assets/logo-smartwater.png'
 
 function LoginScreen(){
     const navigation = useNavigation();
-    const { user, setUser } = React.useContext(AppContext)
+    const { user, setUser } = React.useContext(AppContext);
 
     const [email, setEmail] = React.useState(null);
     const [password, setPassword] = React.useState(null);
@@ -31,7 +31,6 @@ function LoginScreen(){
 
             await AsyncStorage.setItem('token', response.data.token);
             const decodedToken = jwtDecode(response.data.token);
-            console.log(decodedToken);
             setUser({
                 id: decodedToken.id,
                 name: decodedToken.name,
