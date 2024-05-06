@@ -65,12 +65,12 @@ function Goal(){
         <View>
             <Header title="Metas"/>
             <View style={{zIndex: -3}}>
-                <Text style={styles.label}>{user.setting && user.setting.goal ? `Sua meta atual: ${user.setting.goal.toString()}L` : 'Você ainda não possui uma meta.'}</Text>
+                <Text style={styles.label}>{user.setting && user.setting.goal ? `Sua meta atual: ${user.setting?.goal ? user.setting.goal.toString() : null}L` : 'Você ainda não possui uma meta.'}</Text>
                 <Text style={styles.label}>Atualize sua meta mensal (L)</Text>
                     <TextInput
                         keyboardType='numeric'
                         placeholder="Digite sua meta mensal em litros"
-                        value={goal.toString()}
+                        value={goal ? goal.toString(): null}
                         onChangeText={verifyGoal}
                         style={error ? styles.inputError : styles.input}
                     />

@@ -36,6 +36,7 @@ function Menu(){
                 <MenuButton type="Entypo" name="circular-graph" destination="Dashboard" text="Dashboard"/>
                 <MenuButton type="SimpleLineIcons" name="speedometer" destination="Devices" text="Dispositivos"/>
                 <MenuButton type="SimpleLineIcons" name="target" destination="Goal" text="Metas"/>
+                <MenuButton type="SimpleLineIcons" name="drop" destination="Tips" text="Economia"/>
                 <View style={styles.menuContainer}>
                     <TouchableOpacity onPress={logout}>       
                         <Text style={styles.menuItensText}><AntDesign name="logout" size={23} color='#0099FF'/> Logout</Text>

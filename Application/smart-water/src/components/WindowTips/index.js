@@ -1,11 +1,21 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 
 import CustomIcon from "../CustomIcon/index";
 import styles from "./style";
+import { useNavigation } from "@react-navigation/native";
 
 function WindowTips(props){
     const [tip, setTip] = React.useState("Seu consumo está baixo!");
+    const navigation = useNavigation();
+
+    const handleTips = () => {
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Tips'}]
+        })
+        navigation.navigate('Tips');
+    }
 
     const tips = {
         verylow: [ // 50 - 149
@@ -60,12 +70,14 @@ function WindowTips(props){
 
 
     return(
-        <View style={styles.container}>
-            <View style={styles.lamp}>
-                <CustomIcon type="FontAwesome" name="lightbulb-o" color="#0099FF" size={45}/>
+        <TouchableOpacity onPress={handleTips}>
+            <View style={styles.container}>
+                <View style={styles.lamp}>
+                    <CustomIcon type="FontAwesome" name="lightbulb-o" color="#0099FF" size={45}/>
+                </View>
+                <Text style={styles.tips}>{`${tip} Clique para economizar.`}</Text>
             </View>
-            <Text style={styles.tips}>{`${tip} Clique para economizar.`}</Text>
-        </View>
+        </TouchableOpacity>
     );
 }
 
