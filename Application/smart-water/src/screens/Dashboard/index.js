@@ -13,6 +13,7 @@ import CustomIcon from "../../components/CustomIcon";
 import { BASE_URL } from "../../config/config";
 import ChartMonth from "../../components/ChartMonth";
 import WindowTips from "../../components/WindowTips";
+import WeekAverage from "../../components/WeekAverage";
 
 function Dashboard() {
     const { user, setUser } = React.useContext(AppContext);
@@ -135,36 +136,39 @@ function Dashboard() {
     }, [activeDevice])
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
-                <Header />
-                <View style={styles.containerData}>
-                    <HorizontalLine horizontal={6} color='white' size={1} background="#0099FF" />
-                    <Text style={styles.firstText}>{activeDevice ? 'Seu consumo' : 'Selecione um dispositivo'}</Text>
-                    <Text style={styles.nameText}>{activeDevice ? activeDevice.deviceName : '-'}</Text>
-                    <Text style={styles.waterText}>{consumption.toFixed(2).replace('.', ',')}L</Text>
-                    <TouchableOpacity style={styles.deviceButton} onPress={() => {pickerRef.current.focus()}}>
-                        <Text style={styles.deviceButtonText}><CustomIcon type="SimpleLineIcons" name="speedometer" size={18} /> TROCAR DISPOSITIVO</Text>
-                        <Picker
-                            ref={pickerRef}
-                            dropdownIconColor={"#0099FF"}
-                            selectedValue={activeDevice ? activeDevice.deviceId : null}
-                            style={{ display: 'none' }}
-                            onValueChange={handleValueChange}
-                            >
-                            <Picker.Item style={{ display: 'none'}} label="Selecione um dispositivo" value="default-value"/>
-                            {(devices && devices.length !== 0) && devices.map(device => (
-                                <Picker.Item key={device.deviceId} style={{ display: 'none' }} label={device.deviceName} value={{deviceId: device.deviceId, deviceName: device.deviceName}} />
-                            ))}
-                        </Picker>
-                    </TouchableOpacity>
+        <View>
+            <ScrollView>
+                <View style={styles.container}>
+                    <Header />
+                    <View style={styles.containerData}>
+                        <HorizontalLine horizontal={6} color='white' size={1} background="#0099FF" />
+                        <Text style={styles.firstText}>{activeDevice ? 'Seu consumo' : 'Selecione um dispositivo'}</Text>
+                        <Text style={styles.nameText}>{activeDevice ? activeDevice.deviceName : '-'}</Text>
+                        <Text style={styles.waterText}>{consumption.toFixed(2).replace('.', ',')}L</Text>
+                        <TouchableOpacity style={styles.deviceButton} onPress={() => {pickerRef.current.focus()}}>
+                            <Text style={styles.deviceButtonText}><CustomIcon type="SimpleLineIcons" name="speedometer" size={18} /> TROCAR DISPOSITIVO</Text>
+                            <Picker
+                                ref={pickerRef}
+                                dropdownIconColor={"#0099FF"}
+                                selectedValue={activeDevice ? activeDevice.deviceId : null}
+                                style={{ display: 'none' }}
+                                onValueChange={handleValueChange}
+                                >
+                                <Picker.Item style={{ display: 'none'}} label="Selecione um dispositivo" value="default-value"/>
+                                {(devices && devices.length !== 0) && devices.map(device => (
+                                    <Picker.Item key={device.deviceId} style={{ display: 'none' }} label={device.deviceName} value={{deviceId: device.deviceId, deviceName: device.deviceName}} />
+                                ))}
+                            </Picker>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.infoArea}>
+                        <ChartMonth deviceId={activeDevice ? activeDevice.deviceId : null} value={consumption}/>
+                        <WindowTips consumption={parseInt(consumption)}/>
+                        <WeekAverage value={50}/>
+                    </View>
                 </View>
-                <View style={styles.infoArea}>
-                    <ChartMonth deviceId={activeDevice ? activeDevice.deviceId : null} value={consumption}/>
-                    <WindowTips consumption={parseInt(consumption)}/>
-                </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     )
 }
 

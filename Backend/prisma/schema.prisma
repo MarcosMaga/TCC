@@ -19,6 +19,7 @@ model User {
   createdOn DateTime @default(now())
 
   devices Devices[] @relation("UserDevices")
+  likes Like[] @relation("UserLike")
   setting Setting?
 
   @@map("users")
@@ -48,4 +49,24 @@ model Setting{
   goal Int?
 
   @@map("settings")
+}
+
+model Tip{
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  createdOn DateTime @default(now())
+
+  likes Like[] @relation("TipsLike")
+
+  @@map("tips")
+}
+
+model Like{
+  tipId Int
+  tip Tip @relation("TipsLike", fields: [tipId], references: [id])
+  userId String
+  user User @relation("UserLike", fields: [userId], references: [id])
+
+  @@id([tipId, userId])
 }
