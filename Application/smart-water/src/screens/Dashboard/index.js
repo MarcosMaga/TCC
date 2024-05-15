@@ -13,7 +13,7 @@ import CustomIcon from "../../components/CustomIcon";
 import { BASE_URL } from "../../config/config";
 import ChartMonth from "../../components/ChartMonth";
 import WindowTips from "../../components/WindowTips";
-import WeekAverage from "../../components/WeekAverage";
+import MonthAverage from "../../components/MonthAverage";
 
 function Dashboard() {
     const { user, setUser } = React.useContext(AppContext);
@@ -164,7 +164,7 @@ function Dashboard() {
                     <View style={styles.infoArea}>
                         <ChartMonth deviceId={activeDevice ? activeDevice.deviceId : null} value={consumption}/>
                         <WindowTips consumption={parseInt(consumption)}/>
-                        <WeekAverage value={50}/>
+                        <MonthAverage value={parseInt(consumption)}/>
                     </View>
                 </View>
             </ScrollView>

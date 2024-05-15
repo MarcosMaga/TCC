@@ -4,15 +4,15 @@ import { PieChart } from "react-native-gifted-charts";
 
 import styles from "./style";
 
-function WeekAverage(props){
+function MonthAverage(props){
     const data = [
         {value: props.value, color: '#0099FF'},
-        {value: props.value >= 110 ? 0 : 110 - props.value, color: '#77C3F5'}
+        {value: props.value >= 3300 ? 0 : 3300 - props.value, color: '#77C3F5'}
     ]
 
     return (
         <View style={styles.container}>
-            <Text style={styles.chartTitle}>Cons. diário recomendado</Text>
+            <Text style={styles.chartTitle}>Cons. mensal recomendado</Text>
             <View style={styles.chartContainer}>
                 <PieChart
                     data={data}
@@ -21,8 +21,8 @@ function WeekAverage(props){
                     centerLabelComponent={() => {
                         return (
                             <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                <Text style={{fontSize: 38, fontWeight: 'bold', color: '#0099FF', textAlign: 'center'}}>{Math.round((100 * props.value)/110)}%</Text>
-                                <Text style={{textAlign: 'center'}}>{props.value}L/110L</Text>
+                                <Text style={{fontSize: 38, fontWeight: 'bold', color: '#0099FF', textAlign: 'center'}}>{Math.round((100 * props.value)/3300)}%</Text>
+                                <Text style={{textAlign: 'center'}}>{props.value}L/3300L</Text>
                             </View>
                         )
                     }}
@@ -40,4 +40,4 @@ function WeekAverage(props){
     );
 }
 
-export default WeekAverage;
+export default MonthAverage;

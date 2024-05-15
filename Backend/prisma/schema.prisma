@@ -20,6 +20,8 @@ model User {
 
   devices Devices[] @relation("UserDevices")
   likes Like[] @relation("UserLike")
+  tokens Token[] @relation("UserToken")
+  notification NotificationState[] @relation("UserNState")
   setting Setting?
 
   @@map("users")
@@ -69,4 +71,24 @@ model Like{
   user User @relation("UserLike", fields: [userId], references: [id])
 
   @@id([tipId, userId])
+}
+
+model Token{
+  userId String
+  user User @relation("UserToken", fields: [userId], references: [id])
+  token String
+  createdOn DateTime @default(now())
+
+  @@id([userId, token])
+  @@map("tokens")
+}
+
+model NotificationState{
+  id Int @id @default(autoincrement())
+  type String
+  userId String
+  user User @relation("UserNState", fields: [userId], references: [id])
+  createdOn DateTime @default(now())
+
+  @@map("notification_state")
 }

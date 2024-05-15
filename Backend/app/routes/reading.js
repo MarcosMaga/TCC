@@ -7,7 +7,7 @@ const {readingValidator} = require('../validators/reading');
 module.exports = {
     reading: (app) => {
         app.post('/reading', isDevice, readingValidator, (req, res) => {
-            readingController.create(req, res, validationResult(req));
+            readingController.create(req, res, validationResult(req), app);
         })
         app.get('/reading/device/:id', userLogged, (req, res) => {
             readingController.get(req, res);

@@ -26,4 +26,19 @@ const getDevicesByUser = async(id) => {
     })
 }
 
-module.exports = {insertDevices, deleteDevices, getDevicesByUser};
+const getDeviceByDevice = async(id) => {
+    return await prisma.devices.findFirst({
+        where: {
+            deviceId: id
+        },
+        include: {
+            user: {
+                include: {
+                    setting: true
+                }
+            }
+        }
+    })
+}
+
+module.exports = {insertDevices, deleteDevices, getDevicesByUser, getDeviceByDevice};

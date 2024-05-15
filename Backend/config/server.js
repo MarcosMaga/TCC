@@ -7,9 +7,11 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const { Expo } = require('expo-server-sdk');
 dotenv.config();
 
 const app = express();
+app.expo = new Expo();
 app.use(cors({origin: '*'}))
 const server = http.createServer(app);
 const io = socketIO(server, {

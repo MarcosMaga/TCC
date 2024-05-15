@@ -5,6 +5,7 @@ import axios from 'axios';
 import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from 'expo-notifications';
 
 import { AppContext } from "../../contexts/AppContext";
 import { BASE_URL } from '../../config/config';
@@ -38,6 +39,34 @@ function LoginScreen(){
                 createdOn: decodedToken.createdOn,
                 setting: decodedToken.setting
             })
+
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                  shouldShowAlert: true,
+                  shouldPlaySound: true,
+                  shouldSetBadge: true,
+                }),
+            });
+
+            const {status} = await Notifications.requestPermissionsAsync();
+
+            if (status === 'granted') {
+                const tokenNotification = (await Notifications.getExpoPushTokenAsync()).data;
+                const token = await AsyncStorage.getItem('token');
+                try{
+                    await axios.post(`${BASE_URL}/token`, {
+                        token: tokenNotification
+                    }, {
+                        headers: {
+                            Authorization: `${token}`
+                        }
+                    })
+                }catch(error){
+                    console.error(error);
+                }
+            }
+
+
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'Dashboard'}]

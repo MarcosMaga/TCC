@@ -1,19 +1,150 @@
 const readingModel = require('../models/reading');
 const devicesModel = require('../models/devices');
+const notificationStateModel = require('../models/notificationState');
+const tokenModel = require('../models/token');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const dotenv = require('dotenv');
-const { reading } = require('../routes/reading');
+const { Expo } = require('expo-server-sdk');
 dotenv.config();
 
-const create = (req, res, validation) => {
+const create = (req, res, validation, app) => {
     if (!validation.isEmpty()) {
         res.status(400).send({ error: validation.array() });
     } else {
         readingModel.insertReading(req.body)
             .then((readings) => {
-                res.status(200).send(readings);
+                readingModel.getReadingsByActuallyMonth(req.body.deviceId)
+                    .then((value) => {
+                        devicesModel.getDeviceByDevice(req.body.deviceId)
+                            .then((device) => {
+                                if(device.user.setting?.goal){
+                                    if(value._sum.value > device.user.setting.goal){
+                                        notificationStateModel.getNotificationStateByUser(device.userId, 'GOAL_PASS')
+                                            .then((notificationState) => {
+                                                if(notificationState){
+                                                    const date = new Date();
+                                                    const notificationDate = new Date(notificationState.createdOn);
+
+                                                    if(date.getMonth() != notificationDate.getMonth()){
+                                                        tokenModel.getTokensByUser(device.userId)
+                                                        .then((tokens) => {
+                                                            let message = [];
+                                                            tokens.forEach(token => {
+                                                                if(!Expo.isExpoPushToken(token.token)){
+                                                                    console.error(`Token inválido: ${token.token}`);
+                                                                    return;
+                                                                }
+
+                                                                message.push({
+                                                                    to: token.token,
+                                                                    sound: app.sound,
+                                                                    title: 'Meta estourada!',
+                                                                    body: `Você estourou sua meta de consumo de ${device.user.setting.goal}L.`
+                                                                })
+                                                            })
+
+                                                            let chunks = app.expo.chunkPushNotifications(message);
+
+                                                            chunks.forEach(async chunk => {
+                                                                try {
+                                                                    await app.expo.sendPushNotificationsAsync(chunk);
+                                                                } catch (error) {
+                                                                    console.error(error);
+                                                                    res.status(400).send({ error: error.message });
+                                                                }
+                                                            })
+
+                                                            notificationStateModel.insertNotificationState({
+                                                                type: "GOAL_PASS",
+                                                                userId: device.userId
+                                                            }).catch((error) => {
+                                                                console.error(error);
+                                                            }).finally(async () => {
+                                                                await prisma.$disconnect();
+                                                            })
+
+                                                            res.status(200).send(readings);
+                                                        }).catch((error) => {
+                                                            res.status(400).send({ error: error.message });
+                                                            console.log(error);
+                                                        }).finally(async () => {
+                                                            await prisma.$disconnect();
+                                                        })
+                                                    }else{
+                                                        res.status(200).send(readings);
+                                                    }
+                                                }else{
+                                                    tokenModel.getTokensByUser(device.userId)
+                                                        .then((tokens) => {
+                                                            let message = [];
+                                                            tokens.forEach(token => {
+                                                                if(!Expo.isExpoPushToken(token.token)){
+                                                                    console.error(`Token inválido: ${token.token}`);
+                                                                    return;
+                                                                }
+
+                                                                message.push({
+                                                                    to: token.token,
+                                                                    sound: 'default',
+                                                                    title: 'Meta estourada!',
+                                                                    body: `Você estourou sua meta de consumo de ${device.user.setting.goal}L.`
+                                                                })
+                                                            })
+
+                                                            let chunks = app.expo.chunkPushNotifications(message);
+
+                                                            chunks.forEach(async chunk => {
+                                                                try {
+                                                                    await app.expo.sendPushNotificationsAsync(chunk);
+                                                                } catch (error) {
+                                                                    console.error(error);
+                                                                    res.status(400).send({ error: error.message });
+                                                                }
+                                                            })
+
+                                                            notificationStateModel.insertNotificationState({
+                                                                type: "GOAL_PASS",
+                                                                userId: device.userId
+                                                            }).catch((error) => {
+                                                                console.error(error);
+                                                            }).finally(async () => {
+                                                                await prisma.$disconnect();
+                                                            })
+
+                                                            res.status(200).send(readings);
+                                                        }).catch((error) => {
+                                                            res.status(400).send({ error: error.message });
+                                                            console.log(error);
+                                                        }).finally(async () => {
+                                                            await prisma.$disconnect();
+                                                        })
+                                                }
+                                            }).catch((error) => {
+                                                res.status(400).send({ error: error.message });
+                                                console.log(error);
+                                            }).finally(async () => {
+                                                await prisma.$disconnect();
+                                            })
+                                    }else{
+                                        res.status(200).send(readings);
+                                    }
+                                }else{
+                                    res.status(200).send(readings);
+                                }
+                            }).catch((error) => {
+                                res.status(400).send({ error: error.message });
+                                console.log(error);
+                            }).finally(async () => {
+                                await prisma.$disconnect();
+                            })
+                    }).catch((error) => {
+                        res.status(400).send({ error: error.message });
+                        console.log(error);
+                    }).finally(async () => {
+                        await prisma.$disconnect();
+                    })
             }).catch((error) => {
                 res.status(400).send({ error: error.message });
                 console.log(error);
