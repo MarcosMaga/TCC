@@ -33,7 +33,7 @@ function MonthAverage(props){
                 </View>
                 <View style={styles.labelView}>
                     <View style={[styles.labelColor, {backgroundColor: "#77C3F5"}]}/>
-                    <Text>Consumo diário recomendado pela OMS</Text>
+                    <Text>Consumo mensal recomendado pela OMS</Text>
                 </View>
             </View>
         </View>

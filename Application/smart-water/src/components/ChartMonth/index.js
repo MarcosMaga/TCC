@@ -49,8 +49,8 @@ function ChartMonth(props) {
 
                 user.setting?.goal > maxValue ? maxValue = user.setting.goal : null;
                 setMax(Math.round(maxValue));
-                setData(newData.reverse());
-                setGoalData(newGoalData.reverse());
+                setData(newData);
+                setGoalData(newGoalData);
             } catch (error) {
                 console.error(error);
             }

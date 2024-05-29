@@ -50,9 +50,10 @@ const create = (req, res, validation, app) => {
                                                             chunks.forEach(async chunk => {
                                                                 try {
                                                                     await app.expo.sendPushNotificationsAsync(chunk);
+                                                                    console.log('notificação enviada');
                                                                 } catch (error) {
                                                                     console.error(error);
-                                                                    res.status(400).send({ error: error.message });
+                                                                    res.status(200).send({ error: error.message });
                                                                 }
                                                             })
 
@@ -67,7 +68,7 @@ const create = (req, res, validation, app) => {
 
                                                             res.status(200).send(readings);
                                                         }).catch((error) => {
-                                                            res.status(400).send({ error: error.message });
+                                                            res.status(200).send({ error: error.message });
                                                             console.log(error);
                                                         }).finally(async () => {
                                                             await prisma.$disconnect();
@@ -115,14 +116,14 @@ const create = (req, res, validation, app) => {
 
                                                             res.status(200).send(readings);
                                                         }).catch((error) => {
-                                                            res.status(400).send({ error: error.message });
+                                                            res.status(200).send({ error: error.message });
                                                             console.log(error);
                                                         }).finally(async () => {
                                                             await prisma.$disconnect();
                                                         })
                                                 }
                                             }).catch((error) => {
-                                                res.status(400).send({ error: error.message });
+                                                res.status(200).send({ error: error.message });
                                                 console.log(error);
                                             }).finally(async () => {
                                                 await prisma.$disconnect();
@@ -134,7 +135,7 @@ const create = (req, res, validation, app) => {
                                     res.status(200).send(readings);
                                 }
                             }).catch((error) => {
-                                res.status(400).send({ error: error.message });
+                                res.status(200).send({ error: error.message });
                                 console.log(error);
                             }).finally(async () => {
                                 await prisma.$disconnect();

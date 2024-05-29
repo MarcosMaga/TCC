@@ -11,6 +11,9 @@ const getReadingsByDevice = async (id) => {
     return await prisma.reading.findMany({
         where: {
             deviceId: id
+        },
+        orderBy: {
+            createdOn: 'asc'
         }
     })
 }

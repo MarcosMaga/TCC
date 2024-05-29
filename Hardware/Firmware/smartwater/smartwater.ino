@@ -8,7 +8,7 @@
 int sensorPin = D2;
 unsigned long lastTime;
 byte sensorInterrupt = 0;
-const float calibrationFactor = 7.05;
+const float calibrationFactor = 7.15;
 volatile byte pulseCount;
 
 float flowRate;
@@ -28,7 +28,6 @@ String macId = "";
 ESP8266WebServer server(80);
 
 void handleRoot() {
-  // Crie a página web com o formulário HTML
   WiFi.disconnect();
   String html = "<!DOCTYPE html>";
   html += "<html lang='pt'>";
@@ -50,16 +49,13 @@ void handleRoot() {
   html += "<input type='submit' value='Conectar'>";
   html += "</form></body></html>";
 
-  // Envie a página web para o cliente
   server.send(200, "text/html", html);
 }
 
 void handleConfigurarWiFi() {
-  // Obtenha as informações de login da rede WiFi do formulário HTML
   String ssid = server.arg("ssid");
   String senha = server.arg("senha");
 
-  // Configure o ESP8266 para se conectar à rede WiFi
   WiFi.begin(ssid, senha);
 
   int time = 0;
@@ -164,28 +160,7 @@ void loop() {
       realTotal += flowMillilitres;
 
       unsigned int frac;
-      Serial.print("Flow rate: ");
-      Serial.print(int(flowRate));  // Print the integer part of the variable
-      Serial.print(".");            // Print the decimal point
-      // Determine the fractional part. The 10 multiplier gives us 1 decimal place.
       frac = (flowRate - int(flowRate)) * 10;
-      Serial.print(frac, DEC);  // Print the fractional part of the variable
-      Serial.print("L/min");
-      // Print the number of litres flowed in this second
-      Serial.print("  Current Liquid Flowing: ");  // Output separator
-      Serial.print(flowMillilitres);
-      Serial.print("mL/Sec");
-
-      // Print the cumulative total of litres flowed since starting
-      Serial.print("  Output Liquid Quantity: ");  // Output separator
-      Serial.print(totalMillilitres);
-      Serial.println("mL");
-
-      Serial.print("  HTTP Counter: ");
-      Serial.println(httpCounter);
-
-      Serial.print("Real value: ");
-      Serial.println(realTotal);
 
       if (httpCounter == 5) {
         if (totalMillilitres > 0) {
